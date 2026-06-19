@@ -10,27 +10,58 @@
         body {
             background-color: #f4f6f7;
             font-family: Arial, sans-serif;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
         }
+
+      
+        .card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+       
+        input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        
         h1 {
-            color: #d32f2f;
+            color: #372fd3;
             margin-bottom: 20px;
         }
+
         h2 {
-            color: #d32f2f;
+            color: #532fd3;
+            margin-top: 0;      
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
     <h1>Student Management System</h1>
-    <div>
+
+    <div class="card">
          <h2>Add New Student</h2>
          <input type="text" placeholder="Enter Student Name">
          <input type="text" placeholder="Enter Course ID">
          <button>Enroll Student</button>
     </div>
 
-    <hr><div>
+    <div class="card">
         <h2>Enrolled Students</h2>
         <button>Load Students List</button>
         <p>No students loaded yet. Click the button above to fetch data</p>
@@ -42,7 +73,6 @@
                 <th>Course ID</th>
             </tr>
         </table>
-        
     </div>
    
 </body>
