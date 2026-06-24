@@ -2,7 +2,7 @@
 <html lang = "en">
 <head>
     <title>My First Dashboard</title>
-   <style>
+    <style>
         body {
             background-color: #f4f6f7;
             font-family: Arial, sans-serif;
@@ -72,9 +72,9 @@
 
     <main>
          <div>
-            <input type="text" placeholder="Enter Student Name">
-            <input type="text" placeholder="Enter Course ID">
-            <input type="text" placeholder="Enter Student Age">
+            <input type="text" id="studentName" placeholder="Enter Student Name">
+            <input type="text" id="courseId" placeholder="Enter Course ID">
+            <input type="text" id="studentAge" placeholder="Enter Student Age">
             <button>Enroll Student</button>
          </div>
 
@@ -106,6 +106,40 @@
     <footer>
         <p>© 2026 Student Admin Portal. System Status: Online.</p>
     </footer>
+
+    <script>
+        const enrollButton = document.querySelector('button');
+        const nameInput = document.querySelector('#studentName');
+        const courseInput = document.querySelector('#courseId');
+        const ageInput = document.querySelector('#studentAge');
+        const studentTable = document.querySelector('table');
+
+        enrollButton.addEventListener('click', function() {
+            const nameValue = nameInput.value;
+            const courseValue = courseInput.value;
+            const ageValue = ageInput.value;
+
+            if (nameValue === "" || courseValue === "" || ageValue === "") {
+                alert("Please fill out all the fields before enrolling a student!");
+                return;
+            }
+
+            const newRowHTML = `
+                <tr> 
+                    <td>${nameValue}</td>
+                    <td>${courseValue}</td>
+                    <td>${ageValue}</td>
+                </tr>
+            `;
+
+            studentTable.innerHTML += newRowHTML;
+
+            nameInput.value = "";
+            courseInput.value = "";
+            ageInput.value = "";
+        });
+
+    </script>
 
 </body>
 </html>
