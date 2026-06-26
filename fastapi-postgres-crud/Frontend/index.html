@@ -123,12 +123,13 @@
                 alert("Please fill out all the fields before enrolling a student!");
                 return;
             }
-
+        
             const newRowHTML = `
                 <tr> 
                     <td>${nameValue}</td>
                     <td>${courseValue}</td>
                     <td>${ageValue}</td>
+                    <td><button class="delete-btn">Delete</button></td>
                 </tr>
             `;
 
@@ -137,6 +138,13 @@
             nameInput.value = "";
             courseInput.value = "";
             ageInput.value = "";
+        });
+
+        studentTable.addEventListener('click', function(event) {
+            if(event.target.classList.contains('delete-btn')) {
+                const rowToDelete = event.target.closest('tr');
+                rowToDelete.remove();
+            }
         });
 
     </script>
