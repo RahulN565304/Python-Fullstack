@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Dashboard - Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: #1e293b;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #38bdf8;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0369a1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>System Login</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required placeholder="Enter Username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="text" id="password" required placeholder="Enter Password">
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    </form>
+    </div>
+
+    <div id="messageBox" style="margin-top: 1rem; text-align: center; font-size: 0.9rem; padding: 0.5rem; border-radius: 4px; display: none;"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+            const messageBox = document.getElementById('messageBox');
+
+            messageBox.style.display = 'none';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput,
+                        password: passwordInput
+                    })
+                });
+
+                const data = await response.json();
+                messageBox.style.display = 'block';
+
+                if (response.ok) {
+                    messageBox.style.backgroundColor = '#15803d'; 
+                    messageBox.style.color = '#bbf7d0';
+                    messageBox.innerText = `${data.message} Welcome, User ID: ${data.user_id}`;
+                } else {
+                    messageBox.style.backgroundColor = '#991b1b'; 
+                    messageBox.style.color = '#fca5a5';
+                    messageBox.innerText = data.error || 'Login failed.';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                messageBox.style.display = 'block';
+                messageBox.style.backgroundColor = '#991b1b';
+                messageBox.style.color = '#fca5a5';
+                messageBox.innerText = 'Cannot connect to the backend server.';
+            }
+        });
+    </script>
+</body>
+</html>
