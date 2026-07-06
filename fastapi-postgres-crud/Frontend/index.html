@@ -35,7 +35,6 @@
             background-color: #b71c1c;
         }
 
-       
         table {
             width: 100%;
             max-width: 600px;
@@ -79,7 +78,12 @@
          </div>
 
          <h2>Enrolled Students</h2>
-         <table>
+
+         <div style="margin-bottom: 15px;">
+            <input type="text" id="searchBar" placeholder="Search students by name..." style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+         </div>
+
+         <table id=""studentTable>
              <tr>
                  <th>Student Name</th>
                  <th>Course ID</th>
@@ -129,7 +133,10 @@
                     <td>${nameValue}</td>
                     <td>${courseValue}</td>
                     <td>${ageValue}</td>
-                    <td><button class="delete-btn">Delete</button></td>
+                    <td>
+                        <button class="edit-btn">Edit</button>
+                        <button class="delete-btn">Delete</button>
+                    </td>
                 </tr>
             `;
 
@@ -138,14 +145,165 @@
             nameInput.value = "";
             courseInput.value = "";
             ageInput.value = "";
+
+            const studentPackage = {
+               name: nameValue,
+               course: courseValue,
+               age: ageValue
+        };
+
+        fetch('http://127.0.0.1:5000/add_student', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(studentPackage)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Success! Server replied:", data);
+        })
+        .catch(error => {
+            console.error("Connection error:", error);
+        });
+
         });
 
         studentTable.addEventListener('click', function(event) {
             if(event.target.classList.contains('delete-btn')) {
                 const rowToDelete = event.target.closest('tr');
-                rowToDelete.remove();
+
+                const studentId = event.target.getAttribute('data-id');
+
+                const deleteUrl = `http://127.0.0.1:5000/delete_student/` + studentId;
+                fetch(deleteUrl, {
+                    method: 'DELETE'
+                })
+                .then (response => {
+                    if(response.ok) {
+                        rowToDelete.remove();
+                        console.log('Successfully deleted student from DB.')
+                    } else {
+                        alert("Failed to delete student from backend database.");
+                    }
+                })
+                .catch(error => console.error("Network error trying to delete row:", error));
+            }
+
+            if(event.target.classList.contains('edit-btn')) {
+                const editBtn = event.target;
+                const row = editBtn.closest('tr');
+
+                const nameCell = row.cells[0];
+                const courseCell = row.cells[1];
+                const ageCell = row.cells[2];
+
+                if(editBtn.textContent === "Edit") {
+                    
+                    const currentName = nameCell.textContent;
+                    const currentCourse = courseCell.textContent;
+                    const currentAge = ageCell.textContent;
+
+                    nameCell.innerHTML = `<input type="text" value="${currentName}" style="width: 90%;">`;
+                    courseCell.innerHTML = `<input type="text" value="${currentCourse}" style="width: 90%;">`;
+                    ageCell.innerHTML = `<input type="number" value="${currentAge}" style="width: 90%;">`;
+
+                    editBtn.textContent = "Save";
+
+                } else {
+                    
+                    const nameInput = nameCell.querySelector('input');
+                    const courseInput = courseCell.querySelector('input');
+                    const ageInput = ageCell.querySelector('input');
+
+                    const newName = nameInput.value;
+                    const newCourse = courseInput.value;
+                    const newAge = ageInput.value;
+
+                    nameCell.textContent = newName;
+                    courseCell.textcontent = newCourse;
+                    ageCell.textcontent = newAge;
+
+                    editBtn.textcontent = "Edit";
+
+                    const studentId = editBtn.getAttribute('data-id');
+            
+                    const updatedPackage = {
+                        name: newName,
+                        course: newCourse,
+                        age: newAge
+                    };
+
+                    fetch(`http://127.0.0.1:5000/update_student/${studentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedPackage)
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log("Database updated successfully:", data))
+                    .catch(error => console.error("Error updating student in database:", error));
+
+                }
             }
         });
+
+        const searchBar = document.getElementById('searchBar');
+
+        searchBar.addEventListener('input', function(event) {
+            const searchText = event.target.value.toLowerCase();
+            const rows = studentTable.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const nameCell = row.cells[0];
+                if (nameCell) {
+                    const studentName = nameCell.textContent.toLowerCase();
+                    if (studentName.includes(searchText)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            });
+        });
+
+    function loadStudentsFromDatabase() {
+        fetch('http://127.0.0.1:5000/get_students')
+            .then(response => response.json())
+            .then(studentsArray => {
+                const tableBody = document.querySelector('table tbody');
+                
+                tableBody.innerHTML = `
+                    <tr style="background-color: #d32f2f; color: white; font-weight: bold;">
+                        <td>Student Name</td>
+                        <td>Course ID</td>
+                        <td>Student Age</td>
+                        <td>Action</td>
+                    </tr>
+                `;
+
+                studentsArray.forEach(student => {
+                    const newRowHTML = `
+                       <tr> 
+                            <td>${student.name}</td>
+                            <td>${student.course}</td>
+                            <td>${student.age}</td>
+                            <!-- Storing the unique ID on the button using data-id -->
+                            <td>
+                                <button class="edit-btn" data-id="${student.id}">Edit</button>
+                                <button class="delete-btn" data-id="${student.id}">Delete</button>
+                                </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += newRowHTML;
+                });
+            })
+            .catch(error => console.error("Error pulling live rows:", error));
+    }
+    
+
+    window.addEventListener('DOMContentLoaded', loadStudentsFromDatabase);
 
     </script>
 
